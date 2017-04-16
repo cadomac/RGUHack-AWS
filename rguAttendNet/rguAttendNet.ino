@@ -7,6 +7,7 @@
 #include <string.h>
 #include <Key.h>
 #include <Keypad.h>
+#include <b64.h>
 #include <SPI.h>
 #include <Ethernet.h>
 
@@ -42,9 +43,7 @@ Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, rows, cols);
 
 byte mac[] = { 0x98, 0x4F, 0xEE, 0x01, 0xCE, 0x36 };
 
-char server[] = "www.rguattend.com";
-
-IPAddress ip(192, 168, 0, 177);
+char* url = "rguattend.azurewebsites.net";
 
 EthernetClient client;
 
@@ -67,10 +66,8 @@ void setup() {
 void loop() {
   if (Ethernet.begin(mac) == 0) {
     Serial.println("Failed to configure Ethernet using DHCP");
-    Ethernet.begin(mac, ip);
   }
   delay(1000);
-  Serial.println("Connecting...");
   int markFlag = 0;
   char key = keypad.getKey();
   if (key == '#') {
@@ -81,25 +78,24 @@ void loop() {
       Serial.println(" digits.");
     }
     else {
-      for (int i = 0; i < 10; i = i + 1) {
-        if (students[i].equals(input)) {
-          if (attend[i] == 0){
-            attend[i] = 1;
-            Serial.println("Thank you for signing in!");
-          }
-          else{
-            Serial.println("You are already marked for attendance.");
-          }
-          markFlag = 1;
-          break;
-        }
+      Serial.println("Connecting...");
+      if (client.connect(url, 80)){
+        Serial.println("Connected.");
+        String postQuery = "ID=";
+        postQuery += input;
+        Serial.println("POST ID QUERY");
+        client.println("POST /query.php HTTP/1.1");
+        client.println("Host: rguattend.azurewebsites.net");
+        client.println("Content-Type: application/x-www-form-urlencoded");
+        client.println();
+        client.println(postQuery);
+        input = "";
+        inputLen = 0;
       }
-      if (!markFlag){
-        Serial.println("Invalid student ID.");
+      else {
+        Serial.println("Connection failed, please try again.");
       }
     }
-    input = "";
-    inputLen = 0;
   }
   else if(key == '*'){
     Serial.println(input);

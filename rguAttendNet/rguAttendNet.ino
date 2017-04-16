@@ -67,6 +67,7 @@ void setup() {
 }
 
 void loop() {
+  client.connect(url, 80);
   int markFlag = 0;
   char key = keypad.getKey();
   if (key == '#') {
@@ -80,14 +81,14 @@ void loop() {
     }
     else {
       Serial.println("Connecting...");
-      if (client.connect(url, 80)){
+      if (client.connected()){
         Serial.println("Connected.");
         String postQuery = "ID=";
         postQuery += input;
         Serial.println("POST ID QUERY");
         client.println("POST /query.php HTTP/1.1");
         client.println("Host: rguattend.azurewebsites.net");
-        client.println("Content-Type: application/x-www-form-urlencoded");
+        client.println("Content-Type: multipart/form-data");
         client.println();
         client.print(postQuery);
         input = "";

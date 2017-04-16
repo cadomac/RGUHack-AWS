@@ -5,7 +5,7 @@
 
 <?php
 if($_POST["ID"]){
-	echo "<p>" . htmlspecialchars($_POST["ID"]) . "</p>";
+	echo '<p>' . htmlspecialchars($_POST['ID']) . '</p>';
 }
 ?>
 

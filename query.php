@@ -4,7 +4,7 @@
 <body>
 
 <?php
-if($_POST["ID"]){
+if($_POST['ID']){
 	echo '<p>' . htmlspecialchars($_POST['ID']) . '</p>';
 }
 ?>

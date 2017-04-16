@@ -52,6 +52,9 @@ void setup() {
   Serial.begin(9600);
   while(!Serial){
   }
+  if (Ethernet.begin(mac) == 0) {
+    Serial.println("Failed to configure Ethernet using DHCP");
+  }
   pinMode(rowPins[0], INPUT);
   pinMode(rowPins[1], INPUT);
   pinMode(rowPins[2], INPUT);
@@ -64,10 +67,6 @@ void setup() {
 }
 
 void loop() {
-  if (Ethernet.begin(mac) == 0) {
-    Serial.println("Failed to configure Ethernet using DHCP");
-  }
-  delay(1000);
   int markFlag = 0;
   char key = keypad.getKey();
   if (key == '#') {
@@ -76,6 +75,8 @@ void loop() {
       Serial.print("You entered ");
       Serial.print(inputLen);
       Serial.println(" digits.");
+      input = "";
+      inputLen = 0;
     }
     else {
       Serial.println("Connecting...");
@@ -88,7 +89,7 @@ void loop() {
         client.println("Host: rguattend.azurewebsites.net");
         client.println("Content-Type: application/x-www-form-urlencoded");
         client.println();
-        client.println(postQuery);
+        client.print(postQuery);
         input = "";
         inputLen = 0;
       }
